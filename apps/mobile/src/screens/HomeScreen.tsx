@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   View,
   Text,
@@ -10,6 +10,14 @@ import {
 import { Colors } from '../constants/colors'
 import { useAuth } from '../contexts/AuthContext'
 import { DemoBanner } from '../components/DemoBanner'
+import { apiClient } from '../lib/apiClient'
+
+interface DashboardStats {
+  totalUsers: number
+  todayVisitors: number
+  monthlyRevenue: number
+  pendingItems: number
+}
 
 function StatCard({
   title,
@@ -39,9 +47,23 @@ const PROVIDER_BADGE: Record<string, { label: string; color: string; bg: string 
 }
 
 export default function HomeScreen() {
-  const { user } = useAuth()
+  const { user, accessToken } = useAuth()
   const badge = user ? PROVIDER_BADGE[user.provider] : null
   const initial = user?.name?.[0]?.toUpperCase() ?? 'U'
+
+  const [stats, setStats] = useState<DashboardStats>({
+    totalUsers: 0,
+    todayVisitors: 0,
+    monthlyRevenue: 0,
+    pendingItems: 0,
+  })
+
+  useEffect(() => {
+    if (!accessToken) return
+    apiClient.get<DashboardStats>('/stats', accessToken).then((res) => {
+      if (res.success && res.data) setStats(res.data)
+    })
+  }, [accessToken])
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -71,10 +93,10 @@ export default function HomeScreen() {
         {/* 통계 카드 */}
         <Text style={styles.sectionTitle}>현황 요약</Text>
         <View style={styles.statGrid}>
-          <StatCard title="전체 사용자" value="0" description="총 가입자 수" emoji="👥" />
-          <StatCard title="오늘 방문자" value="0" description="24시간 기준" emoji="👁️" />
-          <StatCard title="이번달 매출" value="₩0" description="결제 완료" emoji="💰" />
-          <StatCard title="처리 대기" value="0" description="확인 필요" emoji="📋" />
+          <StatCard title="전체 사용자" value={String(stats.totalUsers)} description="총 가입자 수" emoji="👥" />
+          <StatCard title="오늘 방문자" value={String(stats.todayVisitors)} description="24시간 기준" emoji="👁️" />
+          <StatCard title="이번달 매출" value={`₩${stats.monthlyRevenue.toLocaleString()}`} description="결제 완료" emoji="💰" />
+          <StatCard title="처리 대기" value={String(stats.pendingItems)} description="확인 필요" emoji="📋" />
         </View>
 
         {/* 빠른 메뉴 */}

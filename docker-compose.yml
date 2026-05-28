@@ -20,6 +20,27 @@ services:
       timeout: 5s
       retries: 10
 
+  # ── Hono API 서버 ─────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: base-api
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    env_file:
+      - ./apps/api/.env
+    environment:
+      DATABASE_URL: postgresql://kituser:kitpassword@db:5432/kit_dev
+      PORT: "4000"
+    volumes:
+      - ./apps/api/src:/workspace/apps/api/src
+      - ./packages/db/prisma:/workspace/packages/db/prisma
+    depends_on:
+      db:
+        condition: service_healthy
+
   # ── Next.js 웹 앱 ─────────────────────────────────────────
   web:
     build:

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   View,
   Text,
@@ -12,6 +12,16 @@ import {
 import { Colors } from '../constants/colors'
 import { useAuth } from '../contexts/AuthContext'
 import { DemoBanner } from '../components/DemoBanner'
+import { apiClient } from '../lib/apiClient'
+
+interface UserProfile {
+  id: string
+  name: string | null
+  email: string
+  image: string | null
+  role: 'ADMIN' | 'USER'
+  createdAt: string
+}
 
 function MenuItem({
   label,
@@ -46,10 +56,20 @@ const PROVIDER_LABEL: Record<string, string> = {
 }
 
 export default function ProfileScreen() {
-  const { user, isGuest, logout, exitGuestMode } = useAuth()
+  const { user, isGuest, accessToken, logout, exitGuestMode } = useAuth()
   const [loggingOut, setLoggingOut] = useState(false)
+  const [profile, setProfile] = useState<UserProfile | null>(null)
 
-  const initial = user?.name?.[0]?.toUpperCase() ?? (isGuest ? 'G' : 'U')
+  useEffect(() => {
+    if (!accessToken) return
+    apiClient.get<UserProfile>('/users/me', accessToken).then((res) => {
+      if (res.success && res.data) setProfile(res.data)
+    })
+  }, [accessToken])
+
+  const displayName = profile?.name ?? user?.name ?? (isGuest ? '게스트' : '사용자')
+  const displayEmail = profile?.email ?? user?.email ?? ''
+  const initial = displayName[0]?.toUpperCase() ?? (isGuest ? 'G' : 'U')
 
   const handleLogout = () => {
     Alert.alert('로그아웃', '정말 로그아웃 하시겠습니까?', [
@@ -82,10 +102,8 @@ export default function ProfileScreen() {
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>{initial}</Text>
           </View>
-          <Text style={styles.userName}>
-            {user?.name ?? (isGuest ? '게스트' : '사용자')}
-          </Text>
-          <Text style={styles.userEmail}>{user?.email ?? ''}</Text>
+          <Text style={styles.userName}>{displayName}</Text>
+          <Text style={styles.userEmail}>{displayEmail}</Text>
           {user?.provider ? (
             <View style={styles.providerTag}>
               <Text style={styles.providerTagText}>
@@ -103,8 +121,8 @@ export default function ProfileScreen() {
         <View style={styles.menuSection}>
           <Text style={styles.menuSectionTitle}>계정</Text>
           <View style={styles.menuGroup}>
-            <MenuItem label="이름" value={user?.name} onPress={() => {}} />
-            <MenuItem label="이메일" value={user?.email} onPress={() => {}} />
+            <MenuItem label="이름" value={displayName} onPress={() => {}} />
+            <MenuItem label="이메일" value={displayEmail} onPress={() => {}} />
             <MenuItem label="알림 설정" onPress={() => {}} />
           </View>
         </View>

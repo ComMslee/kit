@@ -3,20 +3,22 @@ import { cookies } from "next/headers"
 import { StatCard } from "@/components/ui/card"
 import { prisma } from "@/lib/db/prisma"
 import { formatDate } from "@/lib/utils"
+import { apiClient } from "@/lib/api-client"
+import type { DashboardStats } from "@kit/types"
 
 export default async function DashboardPage() {
   const session = await auth()
   const isGuest = (await cookies()).get("guest_mode")?.value === "1"
 
-  // 최근 가입 유저 (DB 미연결 시 빈 배열)
-  let recentUsers: Array<{ id: string; name: string | null; email: string; createdAt: Date }> = []
-  let totalUsers = 0
+  // API 서버에서 통계 가져오기 (미연결 시 기본값 유지)
+  let stats: DashboardStats = { totalUsers: 0, todayVisitors: 0, monthlyRevenue: 0, pendingItems: 0 }
+  const statsRes = await apiClient.get<DashboardStats>("/stats", session?.accessToken)
+  if (statsRes.success && statsRes.data) stats = statsRes.data
 
+  // 최근 가입 유저 (DB 직접 조회 — API에 별도 엔드포인트 없음)
+  let recentUsers: Array<{ id: string; name: string | null; email: string; createdAt: Date }> = []
   try {
-    ;[recentUsers, totalUsers] = await Promise.all([
-      prisma.user.findMany({ orderBy: { createdAt: "desc" }, take: 5 }),
-      prisma.user.count(),
-    ])
+    recentUsers = await prisma.user.findMany({ orderBy: { createdAt: "desc" }, take: 5 })
   } catch {
     // DB 미연결 — 기본값 유지
   }
@@ -35,7 +37,7 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="전체 사용자"
-          value={totalUsers.toLocaleString()}
+          value={stats.totalUsers.toLocaleString()}
           description="총 가입자 수"
           trend={{ value: 0, label: "전월 대비" }}
           icon={
@@ -46,7 +48,7 @@ export default async function DashboardPage() {
         />
         <StatCard
           title="오늘 방문자"
-          value="0"
+          value={stats.todayVisitors.toLocaleString()}
           description="24시간 기준"
           trend={{ value: 0, label: "어제 대비" }}
           icon={
@@ -58,7 +60,7 @@ export default async function DashboardPage() {
         />
         <StatCard
           title="이번달 매출"
-          value="₩0"
+          value={`₩${stats.monthlyRevenue.toLocaleString()}`}
           description="결제 완료 기준"
           trend={{ value: 0, label: "전월 대비" }}
           icon={
@@ -69,7 +71,7 @@ export default async function DashboardPage() {
         />
         <StatCard
           title="처리 대기"
-          value="0"
+          value={stats.pendingItems.toLocaleString()}
           description="확인 필요 건수"
           icon={
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>

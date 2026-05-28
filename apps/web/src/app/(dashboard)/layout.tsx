@@ -18,10 +18,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <Sidebar />
       <div className="flex flex-1 flex-col overflow-hidden">
         <Header />
-        {/* 데모 모드 배너 */}
-        <div className="px-6 pt-4">
-          <DemoBanner />
-        </div>
+        {/* API 서버 미연결 시 데모 배너 표시 */}
+        {!process.env.INTERNAL_API_URL && (
+          <div className="px-6 pt-4">
+            <DemoBanner />
+          </div>
+        )}
         <main className="flex-1 overflow-y-auto p-6">{children}</main>
       </div>
     </div>

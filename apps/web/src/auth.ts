@@ -3,6 +3,35 @@ import Credentials from "next-auth/providers/credentials"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "@/lib/db/prisma"
 import { authConfig } from "./auth.config"
+import type { Provider } from "@kit/types"
+
+const API_URL = process.env.INTERNAL_API_URL ?? "http://localhost:4000"
+
+async function fetchApiToken(user: {
+  id?: string
+  name?: string | null
+  email?: string | null
+  image?: string | null
+}, provider: Provider): Promise<{ accessToken: string; refreshToken: string } | null> {
+  try {
+    const res = await fetch(`${API_URL}/auth/token`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        provider,
+        email: user.email ?? "",
+        name: user.name ?? "",
+        image: user.image ?? undefined,
+      }),
+      cache: "no-store",
+    })
+    if (!res.ok) return null
+    const json = await res.json()
+    return json.success ? json.data : null
+  } catch {
+    return null
+  }
+}
 
 // 실제 OAuth 연동 전 사용하는 Mock 유저 (모바일과 동일)
 const MOCK_USERS: Record<string, { id: string; name: string; email: string; image: null }> = {
@@ -36,12 +65,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   callbacks: {
     ...authConfig.callbacks,
-    jwt({ token, user }) {
-      if (user) token.id = user.id
+    async jwt({ token, user, account }) {
+      if (user) {
+        token.id = user.id
+        const provider = (account?.provider ?? "google") as Provider
+        const tokens = await fetchApiToken(user, provider)
+        if (tokens) {
+          token.accessToken = tokens.accessToken
+          token.refreshToken = tokens.refreshToken
+        }
+      }
       return token
     },
     session({ session, token }) {
       if (token.id) session.user.id = token.id as string
+      if (token.accessToken) session.accessToken = token.accessToken
       return session
     },
   },
