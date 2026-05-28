@@ -11,6 +11,7 @@ import {
 } from 'react-native'
 import { Colors } from '../constants/colors'
 import { useAuth } from '../contexts/AuthContext'
+import { DemoBanner } from '../components/DemoBanner'
 
 function MenuItem({
   label,
@@ -45,10 +46,10 @@ const PROVIDER_LABEL: Record<string, string> = {
 }
 
 export default function ProfileScreen() {
-  const { user, logout } = useAuth()
+  const { user, isGuest, logout, exitGuestMode } = useAuth()
   const [loggingOut, setLoggingOut] = useState(false)
 
-  const initial = user?.name?.[0]?.toUpperCase() ?? 'U'
+  const initial = user?.name?.[0]?.toUpperCase() ?? (isGuest ? 'G' : 'U')
 
   const handleLogout = () => {
     Alert.alert('로그아웃', '정말 로그아웃 하시겠습니까?', [
@@ -59,29 +60,43 @@ export default function ProfileScreen() {
         onPress: async () => {
           setLoggingOut(true)
           await logout()
-          // navigation은 AuthContext 상태 변경으로 자동 처리됨
         },
       },
     ])
   }
 
+  const handleExitGuest = () => {
+    Alert.alert('게스트 모드 종료', '로그인 페이지로 이동합니다.', [
+      { text: '취소', style: 'cancel' },
+      { text: '로그인하기', onPress: exitGuestMode },
+    ])
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
+      {/* 데모 모드 배너 */}
+      <DemoBanner />
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* 프로필 영역 */}
         <View style={styles.profileSection}>
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>{initial}</Text>
           </View>
-          <Text style={styles.userName}>{user?.name ?? '사용자'}</Text>
+          <Text style={styles.userName}>
+            {user?.name ?? (isGuest ? '게스트' : '사용자')}
+          </Text>
           <Text style={styles.userEmail}>{user?.email ?? ''}</Text>
-          {user?.provider && (
+          {user?.provider ? (
             <View style={styles.providerTag}>
               <Text style={styles.providerTagText}>
                 {PROVIDER_LABEL[user.provider]} 계정
               </Text>
             </View>
-          )}
+          ) : isGuest ? (
+            <View style={[styles.providerTag, styles.guestTag]}>
+              <Text style={[styles.providerTagText, styles.guestTagText]}>게스트 모드</Text>
+            </View>
+          ) : null}
         </View>
 
         {/* 계정 */}
@@ -105,13 +120,15 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        {/* 로그아웃 */}
+        {/* 로그아웃 / 게스트 종료 */}
         <View style={[styles.menuSection, styles.lastSection]}>
           <View style={styles.menuGroup}>
             {loggingOut ? (
               <View style={styles.menuItem}>
                 <ActivityIndicator color={Colors.error} />
               </View>
+            ) : isGuest ? (
+              <MenuItem label="로그인하기" onPress={handleExitGuest} danger />
             ) : (
               <MenuItem label="로그아웃" onPress={handleLogout} danger />
             )}
@@ -149,6 +166,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   providerTagText: { fontSize: 12, color: Colors.gray500 },
+  guestTag: { backgroundColor: '#FEF3C7' },
+  guestTagText: { color: '#92400E' },
   menuSection: { paddingHorizontal: 20, marginBottom: 20 },
   lastSection: { marginBottom: 40 },
   menuSectionTitle: {

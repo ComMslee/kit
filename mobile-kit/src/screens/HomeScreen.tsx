@@ -9,6 +9,7 @@ import {
 } from 'react-native'
 import { Colors } from '../constants/colors'
 import { useAuth } from '../contexts/AuthContext'
+import { DemoBanner } from '../components/DemoBanner'
 
 function StatCard({
   title,
@@ -44,6 +45,8 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      {/* 데모 모드 배너 */}
+      <DemoBanner />
       <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
         {/* 헤더 */}
         <View style={styles.header}>

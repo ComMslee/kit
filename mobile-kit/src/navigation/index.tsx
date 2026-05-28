@@ -59,7 +59,7 @@ function MainTabs() {
 }
 
 export default function AppNavigator() {
-  const { user, isLoading } = useAuth()
+  const { user, isGuest, isLoading } = useAuth()
 
   if (isLoading) {
     return (
@@ -72,7 +72,7 @@ export default function AppNavigator() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {user ? (
+        {user || isGuest ? (
           <Stack.Screen name="Main" component={MainTabs} />
         ) : (
           <Stack.Screen name="Login" component={LoginScreen} />

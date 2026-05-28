@@ -1,6 +1,7 @@
 import { signIn } from "@/auth"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
+import { DemoBanner } from "@/components/ui/demo-banner"
 
 export default function LoginPage({
   searchParams,
@@ -20,6 +21,9 @@ export default function LoginPage({
 
   return (
     <div className="w-full max-w-sm space-y-6 rounded-2xl bg-white p-8 shadow-lg">
+      {/* 데모 모드 배너 */}
+      <DemoBanner />
+
       {/* 로고 영역 */}
       <div className="text-center">
         <h1 className="text-2xl font-bold text-gray-900">로그인</h1>
@@ -33,7 +37,7 @@ export default function LoginPage({
           action={async () => {
             "use server"
             const params = await searchParams
-            await signIn("kakao", { redirectTo: params.callbackUrl ?? "/dashboard" })
+            await signIn("mock", { provider: "kakao", redirectTo: params.callbackUrl ?? "/dashboard" })
           }}
         >
           <button
@@ -57,7 +61,7 @@ export default function LoginPage({
           action={async () => {
             "use server"
             const params = await searchParams
-            await signIn("naver", { redirectTo: params.callbackUrl ?? "/dashboard" })
+            await signIn("mock", { provider: "naver", redirectTo: params.callbackUrl ?? "/dashboard" })
           }}
         >
           <button
@@ -74,7 +78,7 @@ export default function LoginPage({
           action={async () => {
             "use server"
             const params = await searchParams
-            await signIn("google", { redirectTo: params.callbackUrl ?? "/dashboard" })
+            await signIn("mock", { provider: "google", redirectTo: params.callbackUrl ?? "/dashboard" })
           }}
         >
           <button

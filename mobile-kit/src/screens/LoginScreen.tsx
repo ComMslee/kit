@@ -9,6 +9,7 @@ import {
 } from 'react-native'
 import { Colors } from '../constants/colors'
 import { useAuth, AuthUser } from '../contexts/AuthContext'
+import { DemoBanner } from '../components/DemoBanner'
 
 // 프로바이더별 목업 유저 (실제 OAuth 연동 전까지 사용)
 const MOCK_USERS: Record<string, AuthUser> = {
@@ -33,7 +34,7 @@ const MOCK_USERS: Record<string, AuthUser> = {
 }
 
 export default function LoginScreen() {
-  const { login } = useAuth()
+  const { login, enterGuestMode } = useAuth()
   const [loading, setLoading] = useState<string | null>(null)
 
   const handleLogin = async (provider: 'kakao' | 'naver' | 'google') => {
@@ -52,6 +53,9 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      {/* 데모 모드 배너 — 상단 고정 */}
+      <DemoBanner />
+
       <View style={styles.container}>
         {/* 로고 영역 */}
         <View style={styles.logoArea}>
@@ -107,6 +111,24 @@ export default function LoginScreen() {
             )}
           </TouchableOpacity>
         </View>
+
+        {/* 구분선 */}
+        <View style={styles.divider}>
+          <View style={styles.dividerLine} />
+          <Text style={styles.dividerText}>또는</Text>
+          <View style={styles.dividerLine} />
+        </View>
+
+        {/* 게스트 모드 */}
+        <TouchableOpacity
+          style={[styles.guestButton, isAnyLoading && styles.disabled]}
+          onPress={enterGuestMode}
+          activeOpacity={0.7}
+          disabled={isAnyLoading}
+        >
+          <Text style={styles.guestText}>👤  게스트로 둘러보기</Text>
+        </TouchableOpacity>
+        <Text style={styles.guestNote}>게스트 모드는 앱을 재설치하면 초기화됩니다</Text>
 
         <Text style={styles.footer}>
           로그인 시 서비스 이용약관 및 개인정보처리방침에{'\n'}동의하게 됩니다.
@@ -187,6 +209,43 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     color: Colors.gray700,
+  },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: Colors.gray200,
+  },
+  dividerText: {
+    fontSize: 12,
+    color: Colors.gray400,
+  },
+  guestButton: {
+    height: 52,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    borderColor: Colors.gray300,
+    backgroundColor: Colors.gray100,
+    marginBottom: 8,
+  },
+  guestText: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: Colors.gray500,
+  },
+  guestNote: {
+    fontSize: 11,
+    color: Colors.gray400,
+    textAlign: 'center',
+    marginBottom: 16,
   },
   footer: {
     fontSize: 12,
