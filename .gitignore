@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+
+# Next.js
+.next/
+out/
+
+# Build outputs
+build/
+.vercel/
+
+# Environment
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# OMC (Claude Code internal state)
+.omc/
+
+# TypeScript
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# Prisma
+prisma.config.ts
+
+# Logs
+*.log
+npm-debug.log*
+
+# iOS / Android (빌드 산출물)
+ios/
+android/
