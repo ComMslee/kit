@@ -26,10 +26,10 @@ fi
 echo -e "${GREEN}✅ Docker 확인 완료${NC}"
 
 # ── .env 확인 ────────────────────────────────────────────────
-if [ ! -f "launch-kit/.env" ]; then
+if [ ! -f "apps/web/.env" ]; then
   echo ""
-  echo -e "${YELLOW}⚠️  launch-kit/.env 파일이 없습니다. 기본값으로 생성합니다...${NC}"
-  cp launch-kit/.env.example launch-kit/.env 2>/dev/null || cat > launch-kit/.env << 'EOF'
+  echo -e "${YELLOW}⚠️  apps/web/.env 파일이 없습니다. 기본값으로 생성합니다...${NC}"
+  cp apps/web/.env.example apps/web/.env 2>/dev/null || cat > apps/web/.env << 'EOF'
 DATABASE_URL="postgresql://kituser:kitpassword@db:5432/kit_dev"
 NEXTAUTH_SECRET="dev-secret-change-in-production"
 NEXTAUTH_URL="http://localhost:3000"
@@ -40,8 +40,8 @@ NAVER_CLIENT_SECRET=""
 GOOGLE_CLIENT_ID=""
 GOOGLE_CLIENT_SECRET=""
 EOF
-  echo -e "${GREEN}✅ launch-kit/.env 생성됨${NC}"
-  echo -e "${YELLOW}   OAuth 키가 있다면 launch-kit/.env 파일을 수정하세요.${NC}"
+  echo -e "${GREEN}✅ apps/web/.env 생성됨${NC}"
+  echo -e "${YELLOW}   OAuth 키가 있다면 apps/web/.env 파일을 수정하세요.${NC}"
 fi
 
 # ── 기존 컨테이너 정리 ───────────────────────────────────────

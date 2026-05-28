@@ -7,8 +7,13 @@
 
 ```
 kit/
-├── launch-kit/   # Next.js 15 웹 앱 (App Router · Prisma · NextAuth v5)
-├── mobile-kit/   # React Native + Expo SDK 54 앱
+├── apps/
+│   ├── web/      # Next.js 15 웹 앱 (App Router · NextAuth v5)
+│   ├── mobile/   # React Native + Expo SDK 54 앱
+│   └── api/      # Hono REST API 서버 (Phase 2 예정)
+├── packages/
+│   ├── db/       # Prisma 스키마 + 클라이언트 (공유)
+│   └── types/    # 공유 TypeScript 타입
 └── docs/         # 상세 문서
 ```
 
@@ -25,18 +30,24 @@ kit/
 
 ### 언어 · 타입
 - **TypeScript** 전용 (`.ts` / `.tsx`) — `any` 사용 금지
-- 타입 정의: `launch-kit/src/types/`, `mobile-kit/src/types/`
+- 공유 타입: `packages/types/src/index.ts` (`@kit/types`)
+- Prisma 모델 타입: `packages/db/src/index.ts` (`@kit/db`)
 
-### launch-kit (Next.js)
+### apps/web (Next.js)
 - **Server Component** 기본, 인터랙션 필요 시만 `"use client"`
 - DB는 항상 Server Component 또는 API Route에서 접근 (클라이언트 직접 접근 금지)
-- Prisma 호출은 반드시 `try/catch` — DB 미연결 시 빈 배열 반환
+- Prisma 클라이언트: `import { prisma } from '@/lib/db/prisma'` → `@kit/db` 재export
 - 경로 그룹: `(auth)` 로그인 전, `(dashboard)` 로그인 후
 
-### mobile-kit (React Native)
+### apps/mobile (React Native)
 - 인증 상태: `AuthContext` (AsyncStorage 기반) → `useAuth()` 훅
 - 네비게이션: 로그인 상태에 따라 Stack 자동 전환 (수동 `navigate` 호출 금지)
 - 환경변수 접두어: `EXPO_PUBLIC_` 필수
+
+### packages/db
+- Prisma 스키마: `packages/db/prisma/schema.prisma`
+- 마이그레이션: 루트에서 `npm run db:migrate`
+- 직접 실행: `cd packages/db && npx prisma studio`
 
 ### 커밋 메시지
 ```
@@ -82,8 +93,8 @@ docs: 문서 변경
 
 ## 새 외주 프로젝트 시작 체크리스트
 
-1. `launch-kit/.env.example` → `.env` 복사 후 키 입력
-2. `prisma/schema.prisma` 에 도메인 모델 추가 → `prisma migrate dev`
+1. `apps/web/.env.example` → `.env` 복사 후 키 입력
+2. `packages/db/prisma/schema.prisma` 에 도메인 모델 추가 → `npm run db:migrate`
 3. OAuth 콘솔(카카오/네이버/Google)에서 앱 등록 및 Redirect URI 설정
-4. `mobile-kit/.env` 에 `EXPO_PUBLIC_*` 키 입력
+4. `apps/mobile/.env` 에 `EXPO_PUBLIC_*` 키 입력
 5. `app.json` → `name`, `slug`, `bundleIdentifier` 프로젝트명으로 변경

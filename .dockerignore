@@ -1,0 +1,12 @@
+# node_modules는 Docker 빌드 내에서 npm ci로 설치 (플랫폼 바이너리 충돌 방지)
+**/node_modules
+**/.next
+**/.turbo
+
+# 불필요한 파일 제외
+**/.git
+**/.gitignore
+**/README.md
+**/.env
+**/.env.*
+**/temp_plan.md

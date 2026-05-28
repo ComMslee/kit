@@ -1,0 +1,35 @@
+{
+  "name": "kit",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "web": "turbo run dev --filter=@kit/web",
+    "mobile": "turbo run dev --filter=@kit/mobile",
+    "api": "turbo run dev --filter=@kit/api",
+    "db:generate": "turbo run db:generate --filter=@kit/db",
+    "db:push": "turbo run db:push --filter=@kit/db",
+    "db:migrate": "turbo run db:migrate --filter=@kit/db",
+    "db:studio": "turbo run db:studio --filter=@kit/db"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.4",
+    "typescript": "^5"
+  },
+  "optionalDependencies": {
+    "lightningcss-linux-arm64-gnu": "^1.32.0",
+    "lightningcss-linux-arm64-musl": "^1.32.0",
+    "lightningcss-linux-x64-gnu": "^1.32.0",
+    "lightningcss-linux-x64-musl": "^1.32.0",
+    "@tailwindcss/oxide-linux-arm64-gnu": "^4.3.0",
+    "@tailwindcss/oxide-linux-arm64-musl": "^4.3.0",
+    "@tailwindcss/oxide-linux-x64-gnu": "^4.3.0",
+    "@tailwindcss/oxide-linux-x64-musl": "^4.3.0"
+  }
+}

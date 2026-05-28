@@ -19,7 +19,9 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@kit/db": ["../../packages/db/src/index.ts"],
+      "@kit/types": ["../../packages/types/src/index.ts"]
     }
   },
   "include": [
