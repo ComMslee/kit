@@ -1,10 +1,23 @@
 import { signIn } from "@/auth"
+import { cookies } from "next/headers"
+import { redirect } from "next/navigation"
 
 export default function LoginPage({
   searchParams,
 }: {
   searchParams: Promise<{ callbackUrl?: string }>
 }) {
+  async function enterGuestMode() {
+    "use server"
+    ;(await cookies()).set("guest_mode", "1", {
+      httpOnly: true,
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24, // 24시간
+      path: "/",
+    })
+    redirect("/dashboard")
+  }
+
   return (
     <div className="w-full max-w-sm space-y-6 rounded-2xl bg-white p-8 shadow-lg">
       {/* 로고 영역 */}
@@ -90,6 +103,28 @@ export default function LoginPage({
           </button>
         </form>
       </div>
+
+      {/* 구분선 */}
+      <div className="flex items-center gap-3">
+        <div className="h-px flex-1 bg-gray-200" />
+        <span className="text-xs text-gray-400">또는</span>
+        <div className="h-px flex-1 bg-gray-200" />
+      </div>
+
+      {/* 게스트 모드 */}
+      <form action={enterGuestMode}>
+        <button
+          type="submit"
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-gray-300 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-500 transition hover:bg-gray-100"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+          게스트로 둘러보기
+        </button>
+      </form>
+      <p className="text-center text-xs text-gray-400">게스트 모드는 24시간 유효합니다</p>
     </div>
   )
 }

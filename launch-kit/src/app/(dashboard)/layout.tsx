@@ -1,12 +1,14 @@
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
+import { cookies } from "next/headers"
 import { Sidebar } from "@/components/layout/sidebar"
 import { Header } from "@/components/layout/header"
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await auth()
+  const isGuest = (await cookies()).get("guest_mode")?.value === "1"
 
-  if (!session) {
+  if (!session && !isGuest) {
     redirect("/login")
   }
 

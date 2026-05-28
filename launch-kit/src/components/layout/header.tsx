@@ -1,7 +1,16 @@
 import { auth, signOut } from "@/auth"
+import { cookies } from "next/headers"
+import { redirect } from "next/navigation"
 
 export async function Header() {
   const session = await auth()
+  const isGuest = (await cookies()).get("guest_mode")?.value === "1"
+
+  async function exitGuestMode() {
+    "use server"
+    ;(await cookies()).delete("guest_mode")
+    redirect("/login")
+  }
 
   return (
     <header className="flex h-16 items-center justify-between border-b border-gray-100 bg-white px-6">
@@ -9,7 +18,7 @@ export async function Header() {
       <div />
 
       {/* 유저 정보 */}
-      {session?.user && (
+      {session?.user ? (
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             {session.user.image ? (
@@ -41,7 +50,25 @@ export async function Header() {
             </button>
           </form>
         </div>
-      )}
+      ) : isGuest ? (
+        /* 게스트 모드 표시 */
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 rounded-full bg-amber-50 px-3 py-1">
+            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-200 text-amber-700 text-xs font-semibold">
+              G
+            </div>
+            <span className="text-sm font-medium text-amber-700">게스트</span>
+          </div>
+          <form action={exitGuestMode}>
+            <button
+              type="submit"
+              className="rounded-lg px-3 py-1.5 text-xs font-medium text-amber-600 hover:bg-amber-50 transition"
+            >
+              로그인하기
+            </button>
+          </form>
+        </div>
+      ) : null}
     </header>
   )
 }

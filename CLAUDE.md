@@ -46,6 +46,40 @@ chore: 설정/의존성 변경
 docs: 문서 변경
 ```
 
+## 개발 서버 실행
+
+```bash
+# 웹 + DB (Docker)
+./scripts/docker-setup.sh
+
+# 모바일 (Expo QR)
+./scripts/mobile-start.sh              # QR 기본 모드
+./scripts/mobile-start.sh --ios        # iOS 시뮬레이터
+./scripts/mobile-start.sh --android    # Android 에뮬레이터
+./scripts/mobile-start.sh --tunnel     # 다른 Wi-Fi 환경
+```
+
+> 모바일 QR 코드는 Mac 로컬 IP를 자동 포함 — 같은 Wi-Fi면 별도 설정 불필요.  
+> 실서비스 배포 시 `EXPO_PUBLIC_API_URL`을 실제 도메인으로 변경 필수.
+
+## Docker 컨테이너
+
+| 서비스 | 컨테이너명 | 포트 |
+|--------|-----------|------|
+| Next.js 웹 | `base-web` | 3000 |
+| PostgreSQL | `base-db` | 5432 |
+
+## 인증 구조
+
+| 모드 | 방식 | 유효기간 |
+|------|------|---------|
+| OAuth (카카오/네이버/Google) | NextAuth v5 세션 | 세션 기간 |
+| 게스트 모드 | `guest_mode=1` HttpOnly cookie | 24시간 |
+
+**게스트 모드 흐름:**  
+`/login` → "게스트로 둘러보기" → Server Action이 쿠키 설정 → `/dashboard` 리다이렉트  
+미들웨어(`auth.config.ts`)에서 `request.cookies`로 Edge Runtime 호환 방식으로 확인.
+
 ## 새 외주 프로젝트 시작 체크리스트
 
 1. `launch-kit/.env.example` → `.env` 복사 후 키 입력

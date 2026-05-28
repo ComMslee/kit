@@ -1,10 +1,12 @@
 import { auth } from "@/auth"
+import { cookies } from "next/headers"
 import { StatCard } from "@/components/ui/card"
 import { prisma } from "@/lib/db/prisma"
 import { formatDate } from "@/lib/utils"
 
 export default async function DashboardPage() {
   const session = await auth()
+  const isGuest = (await cookies()).get("guest_mode")?.value === "1"
 
   // 최근 가입 유저 (DB 미연결 시 빈 배열)
   let recentUsers: Array<{ id: string; name: string | null; email: string; createdAt: Date }> = []
@@ -24,7 +26,7 @@ export default async function DashboardPage() {
       {/* 인사말 */}
       <div>
         <h1 className="text-xl font-bold text-gray-900">
-          안녕하세요, {session?.user?.name ?? "관리자"}님 👋
+          안녕하세요, {session?.user?.name ?? (isGuest ? "게스트" : "관리자")}님 👋
         </h1>
         <p className="mt-1 text-sm text-gray-500">오늘도 좋은 하루 되세요.</p>
       </div>

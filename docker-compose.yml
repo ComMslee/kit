@@ -1,0 +1,47 @@
+name: base
+
+services:
+  # ── PostgreSQL ────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: base-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: kituser
+      POSTGRES_PASSWORD: kitpassword
+      POSTGRES_DB: kit_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kituser -d kit_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ── Next.js 웹 앱 ─────────────────────────────────────────
+  web:
+    build:
+      context: ./launch-kit
+      dockerfile: Dockerfile
+    container_name: base-web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./launch-kit/.env             # OAuth 키, NEXTAUTH_SECRET 등
+    environment:
+      # launch-kit/.env 의 DATABASE_URL 을 Docker 서비스명으로 덮어씀
+      DATABASE_URL: postgresql://kituser:kitpassword@db:5432/kit_dev
+    volumes:
+      # 소스 변경 시 핫 리로드 (node_modules 는 컨테이너 것 유지)
+      - ./launch-kit/src:/app/src
+      - ./launch-kit/prisma:/app/prisma
+      - ./launch-kit/public:/app/public
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

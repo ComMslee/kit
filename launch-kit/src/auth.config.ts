@@ -26,15 +26,17 @@ export const authConfig: NextAuthConfig = {
     signIn: "/login",
   },
   callbacks: {
-    authorized({ auth, request: { nextUrl } }) {
+    authorized({ auth, request }) {
+      const { nextUrl } = request
       const isLoggedIn = !!auth?.user
+      const isGuest = request.cookies.get("guest_mode")?.value === "1"
       const PUBLIC_ROUTES = ["/", "/login"]
       const isPublic = PUBLIC_ROUTES.some(
         (r) => nextUrl.pathname === r || nextUrl.pathname.startsWith(r + "/")
       )
 
-      if (!isLoggedIn && !isPublic) {
-        // 비로그인 → 로그인 페이지로 (callbackUrl 포함)
+      if (!isLoggedIn && !isGuest && !isPublic) {
+        // 비로그인·비게스트 → 로그인 페이지로 (callbackUrl 포함)
         return false
       }
       if (isLoggedIn && nextUrl.pathname === "/login") {
