@@ -8,6 +8,10 @@ import type { ApiResponse } from '@kit/types'
 import authRoutes from './routes/auth'
 import usersRoutes from './routes/users'
 import statsRoutes from './routes/stats'
+import paymentsRoutes from './routes/payments'
+import searchRoutes from './routes/search'
+import devicesRoutes from './routes/devices'
+import logsRoutes from './routes/logs'
 
 const app = new Hono()
 
@@ -31,6 +35,10 @@ app.get('/health', (c) => c.json({ ok: true }))
 app.route('/auth', authRoutes)
 app.route('/users', usersRoutes)
 app.route('/stats', statsRoutes)
+app.route('/payments', paymentsRoutes)
+app.route('/search', searchRoutes)
+app.route('/devices', devicesRoutes)
+app.route('/logs', logsRoutes)
 
 app.onError((err, c) => {
   if (err instanceof HTTPException) {

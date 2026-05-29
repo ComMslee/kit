@@ -9,7 +9,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 // ── 공통: 유저 ──────────────────────────────
@@ -22,8 +21,11 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  accounts Account[]
-  sessions Session[]
+  accounts   Account[]
+  sessions   Session[]
+  orders     Order[]
+  devices    Device[]
+  clientLogs ClientLog[]
 
   @@map("users")
 }
@@ -72,4 +74,75 @@ model VerificationToken {
 
   @@unique([identifier, token])
   @@map("verification_tokens")
+}
+
+// ── 결제 ────────────────────────────────────
+model Order {
+  id           String      @id @default(cuid())
+  userId       String
+  amount       Int
+  currency     String      @default("KRW")
+  status       OrderStatus @default(PENDING)
+  provider     String
+  providerTxId String?
+  metadata     Json?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("orders")
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+
+// ── 디바이스 ─────────────────────────────────
+model Device {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  platform  Platform
+  name      String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("devices")
+}
+
+enum Platform {
+  IOS
+  ANDROID
+  WEB
+}
+
+// ── 클라이언트 로그 ───────────────────────────
+model ClientLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  level      LogLevel
+  message    String
+  context    Json?
+  platform   String?
+  appVersion String?
+  createdAt  DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("client_logs")
+}
+
+enum LogLevel {
+  DEBUG
+  INFO
+  WARN
+  ERROR
 }
