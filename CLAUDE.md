@@ -204,6 +204,7 @@ docs: 문서 변경
 | [docs/api.md](docs/api.md) | API 라우트 목록, 요청/응답 스펙 |
 | [docs/deployment.md](docs/deployment.md) | Vercel(웹) · EAS Build(앱) 배포 절차 |
 | [docs/progress.md](docs/progress.md) | Phase별 구현 현황 및 TODO |
+| [docs/todo.md](docs/todo.md) | 새 외주 프로젝트 시작 체크리스트 |
 
 ---
 

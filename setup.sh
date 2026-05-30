@@ -16,10 +16,10 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 echo "실행 방식을 선택하세요:"
 echo ""
-echo "  1) 🐳 도커  (추천 — PostgreSQL + 웹 한번에 실행)"
-echo "  2) 💻 로컬  (웹만 — Node.js 직접 실행)"
-echo "  3) 📱 앱    (mobile-kit — Expo 로컬 실행)"
-echo "  4) 🐳+📱   (도커 웹 + 앱 동시 설정)"
+echo "  1) 🐳 도커  (추천 — PostgreSQL + 웹 + API 한번에 실행)"
+echo "  2) 💻 웹 로컬  (apps/web 직접 실행, DB 별도 필요)"
+echo "  3) 📱 모바일   (apps/mobile — Expo 로컬 실행)"
+echo "  4) 🐳+📱   (도커 웹 + 모바일 동시 설정)"
 echo ""
 read -p "선택 (1/2/3/4): " CHOICE
 
@@ -31,21 +31,21 @@ case "$CHOICE" in
     ;;
   2)
     echo ""
-    echo -e "${CYAN}── launch-kit 로컬 설정 시작 ──${NC}"
-    cd launch-kit && bash scripts/setup.sh
+    echo -e "${CYAN}── 웹 로컬 설정 시작 ──${NC}"
+    bash scripts/web-setup.sh
     ;;
   3)
     echo ""
-    echo -e "${CYAN}── mobile-kit 설정 시작 ──${NC}"
-    cd mobile-kit && bash scripts/setup.sh
+    echo -e "${CYAN}── 모바일 설정 시작 ──${NC}"
+    bash scripts/mobile-setup.sh
     ;;
   4)
     echo ""
     echo -e "${CYAN}── 도커 설정 시작 ──${NC}"
     bash scripts/docker-setup.sh
     echo ""
-    echo -e "${CYAN}── mobile-kit 설정 시작 ──${NC}"
-    (cd mobile-kit && bash scripts/setup.sh)
+    echo -e "${CYAN}── 모바일 설정 시작 ──${NC}"
+    bash scripts/mobile-setup.sh
     ;;
   *)
     echo -e "${RED}잘못된 선택입니다.${NC}"
