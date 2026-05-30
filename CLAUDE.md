@@ -84,12 +84,12 @@ kit/
 │   └── docker-compose.yml          # 3개 서비스: web(3000) · api(4000) · db(5432)
 │   (*.dockerignore은 빌드 컨텍스트인 루트에 위치)
 │
-├── docs/                           # 프로젝트 문서
-│   ├── architecture.md
-│   ├── api.md
-│   ├── auth.md
-│   ├── deployment.md
-│   ├── progress.md                 # Phase별 구현 현황
+├── docs/                           # 프로젝트 문서 (아래 "docs/ 파일 규칙" 참고)
+│   ├── architecture.md             # 레이어별 아키텍처, 컴포넌트 구조
+│   ├── api.md                      # API 라우트 목록, 요청/응답 스펙
+│   ├── auth.md                     # OAuth 흐름, NextAuth 설정, 모바일 인증
+│   ├── deployment.md               # Vercel(웹) · EAS Build(앱) 배포 절차
+│   ├── progress.md                 # Phase별 구현 현황 및 TODO
 │   └── todo.md                     # 새 외주 프로젝트 시작 체크리스트
 │
 ├── .dockerignore                   # Docker 빌드 컨텍스트 제외 규칙 (루트 고정)
@@ -97,6 +97,29 @@ kit/
 ├── turbo.json                      # Turborepo 파이프라인 (이동 불가)
 └── setup.sh                        # 전체 초기 설정 진입점
 ```
+
+---
+
+## docs/ 파일 규칙
+
+### 각 파일의 역할
+| 파일 | 기록 대상 |
+|------|-----------|
+| `architecture.md` | 레이어 구조, 데이터 흐름, 컴포넌트 관계 |
+| `api.md` | 엔드포인트 목록, 요청/응답 스펙, 인증 방식 |
+| `auth.md` | OAuth 흐름, NextAuth 설정, 모바일 JWT 인증 |
+| `deployment.md` | 배포 절차 (Vercel, EAS Build, Docker) |
+| `progress.md` | Phase별 구현 현황, 완료/미완료 항목 |
+| `todo.md` | 새 외주 프로젝트 시작 시 체크리스트 |
+
+### 새 문서 추가 규칙
+- 새로운 기술 결정, 아키텍처 변경, 배포 절차가 생기면 해당 `docs/*.md` 파일에 기록
+- **기존 파일로 커버 안 되는 주제**라면 `docs/{topic}.md` 신규 생성
+- 신규 파일 생성 시 **이 CLAUDE.md의 폴더 구조 트리와 `docs/` 규칙 표를 동시에 업데이트**
+
+### 폴더 구조 변경 시 필수 업데이트
+> 새 폴더·파일이 생기거나 구조가 바뀌면 **반드시 이 CLAUDE.md의 `## 폴더 구조` 트리를 함께 수정**한다.
+> 트리와 실제 구조가 어긋나면 온보딩과 AI 작업 모두 혼란을 유발한다.
 
 ---
 
