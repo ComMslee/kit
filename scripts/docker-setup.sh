@@ -32,6 +32,19 @@ fi
 echo -e "${GREEN}✅ Docker 확인 완료${NC}"
 
 # ── .env 확인 ────────────────────────────────────────────────
+if [ ! -f "apps/api/.env" ]; then
+  echo ""
+  echo -e "${YELLOW}⚠️  apps/api/.env 파일이 없습니다. 기본값으로 생성합니다...${NC}"
+  cp apps/api/.env.example apps/api/.env 2>/dev/null || cat > apps/api/.env << 'EOF'
+PORT=4000
+DATABASE_URL=postgresql://kituser:kitpassword@db:5432/kit_dev
+JWT_ACCESS_SECRET=dev-access-secret-change-in-production
+JWT_REFRESH_SECRET=dev-refresh-secret-change-in-production
+WEB_URL=http://localhost:3000
+EOF
+  echo -e "${GREEN}✅ apps/api/.env 생성됨${NC}"
+fi
+
 if [ ! -f "apps/web/.env" ]; then
   echo ""
   echo -e "${YELLOW}⚠️  apps/web/.env 파일이 없습니다. 기본값으로 생성합니다...${NC}"
