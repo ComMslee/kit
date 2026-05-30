@@ -55,6 +55,8 @@ services:
     environment:
       # apps/web/.env 의 DATABASE_URL 을 Docker 서비스명으로 덮어씀
       DATABASE_URL: postgresql://kituser:kitpassword@db:5432/kit_dev
+      # Docker 내부 네트워크: web → api 컨테이너명으로 접근
+      INTERNAL_API_URL: http://api:4000
     volumes:
       # 소스 변경 시 핫 리로드 (node_modules 는 컨테이너 것 유지)
       - ./apps/web/src:/workspace/apps/web/src
