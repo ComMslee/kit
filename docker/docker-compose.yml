@@ -23,20 +23,20 @@ services:
   # ── Hono API 서버 ─────────────────────────────────────────
   api:
     build:
-      context: .
+      context: ..
       dockerfile: apps/api/Dockerfile
     container_name: base-api
     restart: unless-stopped
     ports:
       - "4000:4000"
     env_file:
-      - ./apps/api/.env
+      - ../apps/api/.env
     environment:
       DATABASE_URL: postgresql://kituser:kitpassword@db:5432/kit_dev
       PORT: "4000"
     volumes:
-      - ./apps/api/src:/workspace/apps/api/src
-      - ./packages/db/prisma:/workspace/packages/db/prisma
+      - ../apps/api/src:/workspace/apps/api/src
+      - ../packages/db/prisma:/workspace/packages/db/prisma
     depends_on:
       db:
         condition: service_healthy
@@ -44,24 +44,21 @@ services:
   # ── Next.js 웹 앱 ─────────────────────────────────────────
   web:
     build:
-      context: .                        # 모노레포 루트를 빌드 컨텍스트로
+      context: ..
       dockerfile: apps/web/Dockerfile
     container_name: base-web
     restart: unless-stopped
     ports:
       - "3000:3000"
     env_file:
-      - ./apps/web/.env                 # OAuth 키, NEXTAUTH_SECRET 등
+      - ../apps/web/.env
     environment:
-      # apps/web/.env 의 DATABASE_URL 을 Docker 서비스명으로 덮어씀
       DATABASE_URL: postgresql://kituser:kitpassword@db:5432/kit_dev
-      # Docker 내부 네트워크: web → api 컨테이너명으로 접근
       INTERNAL_API_URL: http://api:4000
     volumes:
-      # 소스 변경 시 핫 리로드 (node_modules 는 컨테이너 것 유지)
-      - ./apps/web/src:/workspace/apps/web/src
-      - ./packages/db/prisma:/workspace/packages/db/prisma
-      - ./apps/web/public:/workspace/apps/web/public
+      - ../apps/web/src:/workspace/apps/web/src
+      - ../packages/db/prisma:/workspace/packages/db/prisma
+      - ../apps/web/public:/workspace/apps/web/public
     depends_on:
       db:
         condition: service_healthy

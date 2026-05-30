@@ -76,17 +76,26 @@ kit/
 │
 ├── scripts/                        # 루트 공용 스크립트
 │   ├── docker-setup.sh             # Docker 환경 초기화 (웹 + API + DB)
-│   └── mobile-start.sh             # Expo 개발 서버 실행
+│   ├── mobile-start.sh             # Expo 개발 서버 실행
+│   ├── web-setup.sh                # 웹 로컬(비도커) 초기 설정
+│   └── mobile-setup.sh             # 모바일 초기 설정
+│
+├── docker/                         # Docker 관련 파일
+│   └── docker-compose.yml          # 3개 서비스: web(3000) · api(4000) · db(5432)
+│   (*.dockerignore은 빌드 컨텍스트인 루트에 위치)
 │
 ├── docs/                           # 프로젝트 문서
 │   ├── architecture.md
 │   ├── api.md
 │   ├── auth.md
 │   ├── deployment.md
-│   └── progress.md                 # Phase별 구현 현황
+│   ├── progress.md                 # Phase별 구현 현황
+│   └── todo.md                     # 새 외주 프로젝트 시작 체크리스트
 │
-├── docker-compose.yml              # 3개 서비스: web(3000) · api(4000) · db(5432)
-└── turbo.json                      # Turborepo 파이프라인
+├── .dockerignore                   # Docker 빌드 컨텍스트 제외 규칙 (루트 고정)
+├── package.json                    # Turborepo 워크스페이스 루트 (이동 불가)
+├── turbo.json                      # Turborepo 파이프라인 (이동 불가)
+└── setup.sh                        # 전체 초기 설정 진입점
 ```
 
 ---
@@ -138,7 +147,7 @@ kit/
 ### apps/api (Hono)
 - 인증 필요 라우트: `authMiddleware` 적용 후 `c.get('user')`로 페이로드 접근
 - 응답 형식: 항상 `ApiResponse<T>` 래퍼 (`{ success, data?, error? }`)
-- Docker 내부 DB: `DATABASE_URL`은 `docker-compose.yml`이 `db:5432`로 덮어씀
+- Docker 내부 DB: `DATABASE_URL`은 `docker/docker-compose.yml`이 `db:5432`로 덮어씀
 
 ### 커밋 메시지
 ```

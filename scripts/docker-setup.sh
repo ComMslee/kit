@@ -63,19 +63,21 @@ EOF
   echo -e "${YELLOW}   OAuth 키가 있다면 apps/web/.env 파일을 수정하세요.${NC}"
 fi
 
+COMPOSE="docker compose -f docker/docker-compose.yml"
+
 # ── 기존 컨테이너 정리 ───────────────────────────────────────
 echo ""
 echo "🧹 기존 컨테이너 정리..."
-docker compose down --remove-orphans 2>/dev/null || true
+$COMPOSE down --remove-orphans 2>/dev/null || true
 
 # ── 빌드 & 실행 ──────────────────────────────────────────────
 echo ""
 echo "🔨 Docker 이미지 빌드 중..."
-docker compose build
+$COMPOSE build
 
 echo ""
 echo "🚀 컨테이너 시작 중..."
-docker compose up -d
+$COMPOSE up -d
 
 # ── 상태 확인 ────────────────────────────────────────────────
 echo ""
@@ -86,7 +88,7 @@ until curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/login 2>/dev/
   sleep 3
   ELAPSED=$((ELAPSED + 3))
   if [ $ELAPSED -ge $MAX_WAIT ]; then
-    echo -e "${YELLOW}⚠️  타임아웃 — 로그를 확인하세요: docker compose logs -f web${NC}"
+    echo -e "${YELLOW}⚠️  타임아웃 — 로그를 확인하세요: docker compose -f docker/docker-compose.yml logs -f web${NC}"
     break
   fi
   echo "  대기 중... (${ELAPSED}s)"
@@ -100,9 +102,9 @@ echo "  🌐 웹 (base-web):  http://localhost:3000"
 echo "  🗄️  DB  (base-db):  localhost:5432 (kituser / kitpassword / kit_dev)"
 echo ""
 echo "유용한 명령어:"
-echo "  docker compose logs -f        # 전체 로그"
-echo "  docker compose logs -f web    # 웹 로그만"
-echo "  docker compose logs -f db     # DB 로그만"
-echo "  docker compose down           # 종료"
-echo "  docker compose restart web    # 웹 재시작"
+echo "  docker compose -f docker/docker-compose.yml logs -f        # 전체 로그"
+echo "  docker compose -f docker/docker-compose.yml logs -f web    # 웹 로그만"
+echo "  docker compose -f docker/docker-compose.yml logs -f db     # DB 로그만"
+echo "  docker compose -f docker/docker-compose.yml down           # 종료"
+echo "  docker compose -f docker/docker-compose.yml restart web    # 웹 재시작"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
