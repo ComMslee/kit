@@ -18,9 +18,15 @@ if ! command -v docker &>/dev/null; then
 fi
 
 if ! docker info &>/dev/null 2>&1; then
-  echo -e "${RED}❌ Docker 데몬이 실행 중이지 않습니다.${NC}"
-  echo "   Docker Desktop을 실행한 후 다시 시도하세요."
-  exit 1
+  echo -e "${YELLOW}⚙️  Docker 데몬이 꺼져 있습니다. Docker Desktop을 자동 시작합니다...${NC}"
+  open -a Docker
+  echo -n "  대기 중"
+  until docker info &>/dev/null 2>&1; do
+    sleep 2
+    echo -n "."
+  done
+  echo ""
+  echo -e "${GREEN}✅ Docker Desktop 준비 완료${NC}"
 fi
 
 echo -e "${GREEN}✅ Docker 확인 완료${NC}"
